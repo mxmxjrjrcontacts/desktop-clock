@@ -12,45 +12,39 @@
         }
 
         :root {
-            /* Default Dark Mode Theme (100% Fully See-Through) */
+            /* Pure 100% See-Through Dark Contrast */
             --text-main: #ffffff;
-            --text-sub: #cbd5e1;
+            --text-sub: #f1f5f9;
             --text-accent: #38bdf8;
-            --text-muted: #94a3b8;
-            --card-bg: transparent; /* 100% Fully See-Through */
-            --card-border: rgba(255, 255, 255, 0.25);
-            --player-bg: transparent; /* 100% Fully See-Through */
-            --input-bg: rgba(0, 0, 0, 0.25);
-            --btn-bg: rgba(56, 189, 248, 0.15);
-            --btn-border: rgba(56, 189, 248, 0.4);
+            --text-muted: #cbd5e1;
+            --card-border: rgba(255, 255, 255, 0.35);
+            --input-bg: rgba(0, 0, 0, 0.35);
+            --btn-bg: rgba(56, 189, 248, 0.25);
+            --btn-border: rgba(56, 189, 248, 0.6);
             --btn-text: #38bdf8;
-            --overlay-gradient: linear-gradient(90deg, rgba(11, 15, 25, 0.65) 0%, rgba(11, 15, 25, 0.3) 55%, rgba(11, 15, 25, 0.0) 100%);
             --weekend-color: #f87171;
-            --today-bg: rgba(239, 68, 68, 0.4);
+            --today-bg: rgba(239, 68, 68, 0.45);
             --today-border: #ef4444;
             --today-text: #ffffff;
-            --text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+            --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.8);
         }
 
-        /* Dynamic High-Contrast Light Theme (100% Fully See-Through for bright artwork) */
+        /* Pure 100% See-Through Light Contrast (for bright artwork like Luffy / Naruto) */
         body.theme-light {
             --text-main: #0f172a;
-            --text-sub: #1e293b;
+            --text-sub: #0f172a;
             --text-accent: #0369a1;
             --text-muted: #334155;
-            --card-bg: transparent; /* 100% Fully See-Through */
-            --card-border: rgba(0, 0, 0, 0.3);
-            --player-bg: transparent; /* 100% Fully See-Through */
-            --input-bg: rgba(255, 255, 255, 0.35);
-            --btn-bg: rgba(2, 132, 199, 0.15);
-            --btn-border: rgba(2, 132, 199, 0.5);
+            --card-border: rgba(15, 23, 42, 0.35);
+            --input-bg: rgba(255, 255, 255, 0.45);
+            --btn-bg: rgba(2, 132, 199, 0.25);
+            --btn-border: rgba(2, 132, 199, 0.6);
             --btn-text: #0284c7;
-            --overlay-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 55%, rgba(255, 255, 255, 0.0) 100%);
             --weekend-color: #b91c1c;
             --today-bg: rgba(220, 38, 38, 0.3);
             --today-border: #b91c1c;
             --today-text: #7f1d1d;
-            --text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
+            --text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 255, 255, 0.8);
         }
 
         body, html {
@@ -66,16 +60,7 @@
             transition: background-image 0.5s ease-in-out, color 0.3s ease;
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--overlay-gradient);
-            z-index: 0;
-            transition: background 0.3s ease;
-        }
+        /* Overlay removed completely for 100% crystal see-through */
 
         .main-container {
             position: absolute;
@@ -97,16 +82,17 @@
 
         #clock {
             font-size: 3.2rem;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 2px;
             font-variant-numeric: tabular-nums;
             line-height: 1;
             color: var(--text-main);
+            text-shadow: var(--text-shadow);
         }
 
         #date {
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-top: 4px;
             color: var(--text-sub);
             letter-spacing: 1.5px;
@@ -119,7 +105,7 @@
             align-items: center;
             gap: 6px;
             margin-bottom: 12px;
-            background: var(--player-bg);
+            background: transparent;
             border: 1px solid var(--card-border);
             padding: 5px 8px;
             border-radius: 6px;
@@ -134,7 +120,7 @@
             padding: 4px 8px;
             color: var(--text-main);
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
             outline: none;
             text-shadow: var(--text-shadow);
         }
@@ -186,9 +172,11 @@
             width: 100%;
         }
 
-        /* 100% Fully See-Through Month Cards */
+        /* 100% PURE SEE-THROUGH MONTH CARDS */
         .month-card {
-            background: var(--card-bg);
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             border: 1px solid var(--card-border);
             border-radius: 6px;
             padding: 6px 8px;
@@ -198,7 +186,7 @@
 
         .month-title {
             font-size: 0.72rem;
-            font-weight: 700;
+            font-weight: 800;
             text-align: center;
             margin-bottom: 3px;
             color: var(--text-accent);
@@ -215,7 +203,7 @@
         }
 
         .weekdays-row div {
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-muted);
             padding-bottom: 3px;
             text-shadow: var(--text-shadow);
@@ -224,6 +212,7 @@
         .weekdays-row div:nth-child(6), 
         .weekdays-row div:nth-child(7) {
             color: var(--weekend-color);
+            text-shadow: var(--text-shadow);
         }
 
         .days-grid div {
@@ -233,14 +222,15 @@
             align-items: center;
             justify-content: center;
             font-size: 0.58rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-main);
             text-shadow: var(--text-shadow);
         }
 
         .days-grid .weekend {
             color: var(--weekend-color);
-            font-weight: 700;
+            font-weight: 800;
+            text-shadow: var(--text-shadow);
         }
 
         .days-grid .empty {
@@ -252,13 +242,12 @@
             border-radius: 50%;
             background: var(--today-bg);
             color: var(--today-text);
-            font-weight: 800;
+            font-weight: 900;
+            text-shadow: var(--text-shadow);
         }
     </style>
 </head>
 <body>
-
-    <div class="overlay"></div>
 
     <div class="main-container">
         <div class="clock-container">
@@ -310,7 +299,7 @@
             'wallpaper 002 (12).png'
         ];
 
-        // Format names safely for URLs (handles spaces and parentheses)
+        // Format names safely for URLs
         const artworkList = rawArtworkList.map(name => encodeURI(name));
 
         function shuffle(array) {
@@ -358,7 +347,7 @@
                     canvas.width = 100;
                     canvas.height = 100;
 
-                    // Sample the left half of the image
+                    // Sample the left half of the image where text is placed
                     ctx.drawImage(img, 0, 0, img.width * 0.5, img.height, 0, 0, 100, 100);
                     const imgData = ctx.getImageData(0, 0, 100, 100).data;
 
