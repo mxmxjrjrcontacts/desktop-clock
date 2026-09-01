@@ -12,43 +12,45 @@
         }
 
         :root {
-            /* Default Dark Mode Theme (See-Through Glassmorphic) */
+            /* Default Dark Mode Theme (100% Fully See-Through) */
             --text-main: #ffffff;
             --text-sub: #cbd5e1;
             --text-accent: #38bdf8;
             --text-muted: #94a3b8;
-            --card-bg: rgba(15, 23, 42, 0.45); /* See-through glass */
-            --card-border: rgba(255, 255, 255, 0.15);
-            --player-bg: rgba(15, 23, 42, 0.5);
-            --input-bg: rgba(0, 0, 0, 0.3);
-            --btn-bg: rgba(56, 189, 248, 0.2);
+            --card-bg: transparent; /* 100% Fully See-Through */
+            --card-border: rgba(255, 255, 255, 0.25);
+            --player-bg: transparent; /* 100% Fully See-Through */
+            --input-bg: rgba(0, 0, 0, 0.25);
+            --btn-bg: rgba(56, 189, 248, 0.15);
             --btn-border: rgba(56, 189, 248, 0.4);
             --btn-text: #38bdf8;
-            --overlay-gradient: linear-gradient(90deg, rgba(11, 15, 25, 0.8) 0%, rgba(11, 15, 25, 0.45) 55%, rgba(11, 15, 25, 0.1) 100%);
+            --overlay-gradient: linear-gradient(90deg, rgba(11, 15, 25, 0.65) 0%, rgba(11, 15, 25, 0.3) 55%, rgba(11, 15, 25, 0.0) 100%);
             --weekend-color: #f87171;
-            --today-bg: rgba(239, 68, 68, 0.35);
+            --today-bg: rgba(239, 68, 68, 0.4);
             --today-border: #ef4444;
             --today-text: #ffffff;
+            --text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
         }
 
-        /* Dynamic High-Contrast Light Theme (See-Through Glassmorphic for bright backgrounds) */
+        /* Dynamic High-Contrast Light Theme (100% Fully See-Through for bright artwork) */
         body.theme-light {
             --text-main: #0f172a;
             --text-sub: #1e293b;
-            --text-accent: #0284c7;
-            --text-muted: #475569;
-            --card-bg: rgba(255, 255, 255, 0.55); /* See-through glass light */
-            --card-border: rgba(0, 0, 0, 0.18);
-            --player-bg: rgba(255, 255, 255, 0.6);
-            --input-bg: rgba(255, 255, 255, 0.4);
-            --btn-bg: rgba(2, 132, 199, 0.2);
+            --text-accent: #0369a1;
+            --text-muted: #334155;
+            --card-bg: transparent; /* 100% Fully See-Through */
+            --card-border: rgba(0, 0, 0, 0.3);
+            --player-bg: transparent; /* 100% Fully See-Through */
+            --input-bg: rgba(255, 255, 255, 0.35);
+            --btn-bg: rgba(2, 132, 199, 0.15);
             --btn-border: rgba(2, 132, 199, 0.5);
             --btn-text: #0284c7;
-            --overlay-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.4) 55%, rgba(255, 255, 255, 0.05) 100%);
-            --weekend-color: #dc2626;
-            --today-bg: rgba(220, 38, 38, 0.25);
-            --today-border: #dc2626;
+            --overlay-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 55%, rgba(255, 255, 255, 0.0) 100%);
+            --weekend-color: #b91c1c;
+            --today-bg: rgba(220, 38, 38, 0.3);
+            --today-border: #b91c1c;
             --today-text: #7f1d1d;
+            --text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
         }
 
         body, html {
@@ -90,7 +92,7 @@
 
         .clock-container {
             margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: var(--text-shadow);
         }
 
         #clock {
@@ -104,11 +106,12 @@
 
         #date {
             font-size: 0.95rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-top: 4px;
             color: var(--text-sub);
             letter-spacing: 1.5px;
             text-transform: uppercase;
+            text-shadow: var(--text-shadow);
         }
 
         .music-player {
@@ -117,7 +120,6 @@
             gap: 6px;
             margin-bottom: 12px;
             background: var(--player-bg);
-            backdrop-filter: blur(10px);
             border: 1px solid var(--card-border);
             padding: 5px 8px;
             border-radius: 6px;
@@ -132,8 +134,9 @@
             padding: 4px 8px;
             color: var(--text-main);
             font-size: 0.75rem;
+            font-weight: 600;
             outline: none;
-            backdrop-filter: blur(4px);
+            text-shadow: var(--text-shadow);
         }
 
         .music-player input[type="text"]::placeholder {
@@ -153,7 +156,6 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            backdrop-filter: blur(4px);
         }
 
         .music-player button:hover {
@@ -184,16 +186,14 @@
             width: 100%;
         }
 
-        /* See-Through Glassmorphic Month Cards */
+        /* 100% Fully See-Through Month Cards */
         .month-card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--card-border);
             border-radius: 6px;
             padding: 6px 8px;
             text-align: left;
-            transition: background 0.3s ease, border-color 0.3s ease;
+            transition: border-color 0.3s ease;
         }
 
         .month-title {
@@ -204,6 +204,7 @@
             color: var(--text-accent);
             letter-spacing: 1px;
             text-transform: uppercase;
+            text-shadow: var(--text-shadow);
         }
 
         .weekdays-row, .days-grid {
@@ -217,6 +218,7 @@
             font-weight: 700;
             color: var(--text-muted);
             padding-bottom: 3px;
+            text-shadow: var(--text-shadow);
         }
 
         .weekdays-row div:nth-child(6), 
@@ -233,6 +235,7 @@
             font-size: 0.58rem;
             font-weight: 600;
             color: var(--text-main);
+            text-shadow: var(--text-shadow);
         }
 
         .days-grid .weekend {
@@ -319,7 +322,7 @@
             return arr;
         }
 
-        // Persistent Shuffle Deck (Cycles without repeats across reloads and clicks)
+        // Persistent Shuffle Deck
         function getNextArtwork() {
             let queue = [];
             try {
