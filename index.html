@@ -58,7 +58,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-main);
             background-color: #0b0f19;
-            background-image: url('dabimyhero.png');
             background-size: cover;
             background-position: right center;
             background-repeat: no-repeat;
@@ -186,7 +185,7 @@
 
         /* 100% Solid Opaque Month Cards */
         .month-card {
-            background: var(--card-bg); /* 100% Opacity */
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border-radius: 6px;
@@ -278,25 +277,36 @@
     <div id="hidden-player-slot"></div>
 
     <script>
-        // Full Wallpaper Library (Including all your uploaded artworks)
+        // Full list of 24 registered artworks
         const artworkList = [
+            'ash-ketchum-pikachu-3840x2160-10890.jpg',
             'dabimyhero.png',
-            'naruto-uzumaki-3840x2160-25560.jpg',
-            'zenitsu-agatsuma-3840x2160-26517.jpg',
-            'itachi-uchiha-naruto-minimal-art-red-background-5k-3840x2160-7749.jpg',
-            'kakashi-hatake-naruto-minimal-art-3840x2160-8185.jpg',
-            'izuku-midoriya-deku-my-hero-academia-green-background-3840x2160-9151.jpg',
-            'denki-kaminari-stun-gun-hero-my-hero-academia-yellow-3840x2160-9145.jpg',
-            'my-hero-academia-3840x2160-20839.jpg',
+            'denki-kaminari-stun-gun-hero-my-hero-academia-yellow-3840x2160-9145.png',
+            'fullmetal-alchemist-3840x2160-10389.png',
+            'fullmetal-alchemist-3840x2160-10396.png',
+            'gintoki-sakata-3840x2160-16158.jpg',
+            'goku-daima-dragon-3840x2160-23162.jpg',
+            'goku-orange-3840x2160-23199.jpg',
+            'ichigo-kurosaki-3840x2160-10580.png',
+            'ino-yamanaka-hinata-3840x2160-15427.jpg',
             'itachi-uchiha-3840x2160-9181.jpg',
-            'tanjiro-kamado-3840x2160-9316.jpg',
-            'goku-daima-dragon-3840x2160-23162.jpg'
+            'itachi-uchiha-naruto-minimal-art-red-background-5k-3840x2160-7749.jpg',
+            'izuku-midoriya-deku-3840x2160-10511.png',
+            'izuku-midoriya-deku-my-hero-academia-green-background-3840x2160-9151.png',
+            'kakashi-hatake-naruto-minimal-art-3840x2160-8185.png',
+            'monkey-d-luffy-3840x2160-15618.png',
+            'monkey-d-luffy-3840x2160-25434.jpg',
+            'my-hero-academia-3840x2160-20839.png',
+            'naruto-uzumaki-3840x2160-25560.png',
+            'solo-leveling-blue-3840x2160-17997.jpg',
+            'son-goku-power-pole-3840x2160-25348.jpg',
+            'sung-jinwoo-blue-3840x2160-21294.jpg',
+            'tanjiro-kamado-3840x2160-9316.png',
+            'zenitsu-agatsuma-3840x2160-26517.png'
         ];
 
-        // Non-repeating Shuffle Cycle Manager
-        let playlistQueue = [];
-
-        function shuffleArray(array) {
+        // Fisher-Yates Shuffle
+        function shuffle(array) {
             let arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -305,14 +315,29 @@
             return arr;
         }
 
+        // Persistent Non-repeating Cycle Manager using localStorage
         function getNextArtwork() {
-            if (playlistQueue.length === 0) {
-                playlistQueue = shuffleArray(artworkList);
+            let queue = [];
+            try {
+                const savedQueue = localStorage.getItem('wallpaper_deck');
+                if (savedQueue) {
+                    queue = JSON.parse(savedQueue);
+                }
+            } catch (e) {
+                queue = [];
             }
-            return playlistQueue.pop();
+
+            // If queue is empty or exhausted, create a fresh randomized deck
+            if (!queue || queue.length === 0) {
+                queue = shuffle(artworkList);
+            }
+
+            const nextImg = queue.pop();
+            localStorage.setItem('wallpaper_deck', JSON.stringify(queue));
+            return nextImg;
         }
 
-        // Automatic Dynamic Contrast & Color Analysis
+        // Dynamic Contrast Detection via Offscreen Canvas
         function applyArtwork(imageSrc) {
             document.body.style.backgroundImage = `url('${imageSrc}')`;
             
@@ -327,7 +352,7 @@
                     canvas.width = 100;
                     canvas.height = 100;
 
-                    // Sample the left 50% where the clock & calendar sit
+                    // Sample the left 50% where text and calendar reside
                     ctx.drawImage(img, 0, 0, img.width * 0.5, img.height, 0, 0, 100, 100);
                     const imgData = ctx.getImageData(0, 0, 100, 100).data;
 
@@ -344,17 +369,17 @@
                     const avgG = totalG / count;
                     const avgB = totalB / count;
 
-                    // Calculate perceived brightness using ITU-R BT.709 formula
+                    // Perceived luminance formula (ITU-R BT.709)
                     const brightness = (avgR * 0.2126) + (avgG * 0.7152) + (avgB * 0.0722);
 
-                    // If brightness is high (e.g. bright yellow, light blue, white), trigger light mode with dark text
+                    // Switch to theme-light if background is bright
                     if (brightness > 135) {
                         document.body.classList.add('theme-light');
                     } else {
                         document.body.classList.remove('theme-light');
                     }
                 } catch (e) {
-                    console.log("Canvas contrast fallback active.");
+                    console.log("Contrast calculation fallback active.");
                 }
             };
         }
@@ -363,7 +388,7 @@
             applyArtwork(getNextArtwork());
         }
 
-        // Auto switch wallpaper every 10 minutes (600,000 ms) with no duplicates in cycle
+        // Auto switch wallpaper every 10 minutes (600,000 ms)
         setInterval(() => {
             applyArtwork(getNextArtwork());
         }, 10 * 60 * 1000);
@@ -494,7 +519,7 @@
             document.getElementById('hidden-player-slot').innerHTML = '';
         }
 
-        // Initial setup
+        // Run immediately on page load: select next non-repeating wallpaper and start clocks
         applyArtwork(getNextArtwork());
         setInterval(updateClockAndCalendar, 1000);
         updateClockAndCalendar();
