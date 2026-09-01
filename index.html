@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dabi Clock, Calendar & Audio Player</title>
+    <title>Dynamic Anime Wallpaper Clock & Calendar</title>
     <style>
         * {
             margin: 0;
@@ -11,17 +11,58 @@
             box-sizing: border-box;
         }
 
+        :root {
+            /* Default Dark Mode Theme */
+            --text-main: #ffffff;
+            --text-sub: #cbd5e1;
+            --text-accent: #38bdf8;
+            --text-muted: #94a3b8;
+            --card-bg: #0f172a; /* 100% Opaque */
+            --card-border: rgba(255, 255, 255, 0.18);
+            --player-bg: #1e293b;
+            --input-bg: #0f172a;
+            --btn-bg: rgba(56, 189, 248, 0.2);
+            --btn-border: rgba(56, 189, 248, 0.5);
+            --btn-text: #38bdf8;
+            --overlay-gradient: linear-gradient(90deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.45) 55%, rgba(15, 23, 42, 0.05) 100%);
+            --weekend-color: #f87171;
+            --today-bg: rgba(239, 68, 68, 0.35);
+            --today-border: #ef4444;
+            --today-text: #ffffff;
+        }
+
+        /* Dynamic High-Contrast Light Theme (Triggered on light/bright backgrounds) */
+        body.theme-light {
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-accent: #0284c7;
+            --text-muted: #64748b;
+            --card-bg: #ffffff; /* 100% Opaque */
+            --card-border: rgba(0, 0, 0, 0.15);
+            --player-bg: #f1f5f9;
+            --input-bg: #ffffff;
+            --btn-bg: rgba(2, 132, 199, 0.15);
+            --btn-border: rgba(2, 132, 199, 0.5);
+            --btn-text: #0284c7;
+            --overlay-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.4) 55%, rgba(255, 255, 255, 0.05) 100%);
+            --weekend-color: #dc2626;
+            --today-bg: rgba(220, 38, 38, 0.2);
+            --today-border: #dc2626;
+            --today-text: #991b1b;
+        }
+
         body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #ffffff;
+            color: var(--text-main);
             background-color: #0b0f19;
             background-image: url('dabimyhero.png');
             background-size: cover;
             background-position: right center;
             background-repeat: no-repeat;
+            transition: background-image 0.6s ease-in-out, color 0.3s ease;
         }
 
         .overlay {
@@ -30,8 +71,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, rgba(11, 15, 25, 0.85) 0%, rgba(11, 15, 25, 0.6) 55%, rgba(11, 15, 25, 0.15) 100%);
+            background: var(--overlay-gradient);
             z-index: 0;
+            transition: background 0.3s ease;
         }
 
         .main-container {
@@ -49,22 +91,23 @@
 
         .clock-container {
             margin-bottom: 8px;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
         }
 
         #clock {
             font-size: 3.2rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 2px;
             font-variant-numeric: tabular-nums;
             line-height: 1;
+            color: var(--text-main);
         }
 
         #date {
             font-size: 0.95rem;
-            font-weight: 300;
+            font-weight: 500;
             margin-top: 4px;
-            color: #cbd5e1;
+            color: var(--text-sub);
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
@@ -74,9 +117,9 @@
             align-items: center;
             gap: 6px;
             margin-bottom: 12px;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--player-bg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             padding: 5px 8px;
             border-radius: 6px;
             width: 100%;
@@ -84,45 +127,43 @@
 
         .music-player input[type="text"] {
             flex: 1;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
             border-radius: 4px;
             padding: 4px 8px;
-            color: #ffffff;
+            color: var(--text-main);
             font-size: 0.75rem;
             outline: none;
-            backdrop-filter: blur(4px);
         }
 
         .music-player input[type="text"]::placeholder {
-            color: #cbd5e1;
+            color: var(--text-muted);
         }
 
         .music-player button {
-            background: rgba(56, 189, 248, 0.2);
-            border: 1px solid rgba(56, 189, 248, 0.4);
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
             border-radius: 4px;
             width: 28px;
             height: 26px;
-            color: #38bdf8;
+            color: var(--btn-text);
             font-size: 0.85rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            backdrop-filter: blur(4px);
         }
 
         .music-player button:hover {
-            background: rgba(56, 189, 248, 0.4);
+            opacity: 0.85;
         }
 
         .music-player button.active {
-            background: rgba(56, 189, 248, 0.6);
-            border-color: #38bdf8;
+            background: var(--text-accent);
+            border-color: var(--text-accent);
             color: #ffffff;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+            box-shadow: 0 0 8px var(--text-accent);
         }
 
         #hidden-player-slot {
@@ -135,6 +176,7 @@
             pointer-events: none;
         }
 
+        /* Full Year Calendar Grid: 4 columns x 3 rows */
         .calendar-year-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -142,24 +184,25 @@
             width: 100%;
         }
 
+        /* 100% Solid Opaque Month Cards */
         .month-card {
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--card-bg); /* 100% Opacity */
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border-radius: 6px;
-            padding: 5px 7px;
+            padding: 6px 8px;
             text-align: left;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .month-title {
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-size: 0.72rem;
+            font-weight: 700;
             text-align: center;
             margin-bottom: 3px;
-            color: #38bdf8;
+            color: var(--text-accent);
             letter-spacing: 1px;
             text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .weekdays-row, .days-grid {
@@ -170,28 +213,30 @@
         }
 
         .weekdays-row div {
-            font-weight: 600;
-            color: #94a3b8;
-            padding-bottom: 2px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding-bottom: 3px;
         }
 
         .weekdays-row div:nth-child(6), 
         .weekdays-row div:nth-child(7) {
-            color: #f87171;
+            color: var(--weekend-color);
         }
 
         .days-grid div {
-            padding: 1px 0;
+            padding: 1.5px 0;
             margin: 0.5px 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.58rem;
+            font-weight: 600;
+            color: var(--text-main);
         }
 
         .days-grid .weekend {
-            color: #f87171;
-            font-weight: 500;
+            color: var(--weekend-color);
+            font-weight: 700;
         }
 
         .days-grid .empty {
@@ -199,11 +244,11 @@
         }
 
         .days-grid .today {
-            border: 1.5px solid #ef4444;
+            border: 1.5px solid var(--today-border);
             border-radius: 50%;
-            background: rgba(239, 68, 68, 0.35);
-            color: #ffffff;
-            font-weight: bold;
+            background: var(--today-bg);
+            color: var(--today-text);
+            font-weight: 800;
         }
     </style>
 </head>
@@ -222,17 +267,108 @@
             <button onclick="playAudioStream()" title="Play">▶</button>
             <button onclick="toggleLoop()" id="loop-btn" class="active" title="Toggle Loop">🔁</button>
             <button onclick="stopAudioStream()" title="Stop">⏹</button>
+            <button onclick="nextArtworkManual()" title="Next Wallpaper">🖼️</button>
         </div>
 
         <div class="calendar-year-grid" id="year-calendar"></div>
     </div>
 
-    <!-- Offscreen Player Slot -->
+    <canvas id="color-canvas" style="display:none;"></canvas>
+
     <div id="hidden-player-slot"></div>
 
     <script>
-        let isLoopEnabled = true;
+        // Full Wallpaper Library (Including all your uploaded artworks)
+        const artworkList = [
+            'dabimyhero.png',
+            'naruto-uzumaki-3840x2160-25560.jpg',
+            'zenitsu-agatsuma-3840x2160-26517.jpg',
+            'itachi-uchiha-naruto-minimal-art-red-background-5k-3840x2160-7749.jpg',
+            'kakashi-hatake-naruto-minimal-art-3840x2160-8185.jpg',
+            'izuku-midoriya-deku-my-hero-academia-green-background-3840x2160-9151.jpg',
+            'denki-kaminari-stun-gun-hero-my-hero-academia-yellow-3840x2160-9145.jpg',
+            'my-hero-academia-3840x2160-20839.jpg',
+            'itachi-uchiha-3840x2160-9181.jpg',
+            'tanjiro-kamado-3840x2160-9316.jpg',
+            'goku-daima-dragon-3840x2160-23162.jpg'
+        ];
 
+        // Non-repeating Shuffle Cycle Manager
+        let playlistQueue = [];
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function getNextArtwork() {
+            if (playlistQueue.length === 0) {
+                playlistQueue = shuffleArray(artworkList);
+            }
+            return playlistQueue.pop();
+        }
+
+        // Automatic Dynamic Contrast & Color Analysis
+        function applyArtwork(imageSrc) {
+            document.body.style.backgroundImage = `url('${imageSrc}')`;
+            
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = imageSrc;
+
+            img.onload = function() {
+                try {
+                    const canvas = document.getElementById('color-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 100;
+                    canvas.height = 100;
+
+                    // Sample the left 50% where the clock & calendar sit
+                    ctx.drawImage(img, 0, 0, img.width * 0.5, img.height, 0, 0, 100, 100);
+                    const imgData = ctx.getImageData(0, 0, 100, 100).data;
+
+                    let totalR = 0, totalG = 0, totalB = 0, count = 0;
+
+                    for (let i = 0; i < imgData.length; i += 4) {
+                        totalR += imgData[i];
+                        totalG += imgData[i + 1];
+                        totalB += imgData[i + 2];
+                        count++;
+                    }
+
+                    const avgR = totalR / count;
+                    const avgG = totalG / count;
+                    const avgB = totalB / count;
+
+                    // Calculate perceived brightness using ITU-R BT.709 formula
+                    const brightness = (avgR * 0.2126) + (avgG * 0.7152) + (avgB * 0.0722);
+
+                    // If brightness is high (e.g. bright yellow, light blue, white), trigger light mode with dark text
+                    if (brightness > 135) {
+                        document.body.classList.add('theme-light');
+                    } else {
+                        document.body.classList.remove('theme-light');
+                    }
+                } catch (e) {
+                    console.log("Canvas contrast fallback active.");
+                }
+            };
+        }
+
+        function nextArtworkManual() {
+            applyArtwork(getNextArtwork());
+        }
+
+        // Auto switch wallpaper every 10 minutes (600,000 ms) with no duplicates in cycle
+        setInterval(() => {
+            applyArtwork(getNextArtwork());
+        }, 10 * 60 * 1000);
+
+        // Clock and Calendar Updater
         function updateClockAndCalendar() {
             const now = new Date();
             
@@ -304,6 +440,9 @@
             yearContainer.innerHTML = htmlContent;
         }
 
+        // Hidden Audio Player Engine
+        let isLoopEnabled = true;
+
         function extractYouTubeId(url) {
             let videoId = '';
             if (url.includes('youtu.be/')) {
@@ -355,6 +494,8 @@
             document.getElementById('hidden-player-slot').innerHTML = '';
         }
 
+        // Initial setup
+        applyArtwork(getNextArtwork());
         setInterval(updateClockAndCalendar, 1000);
         updateClockAndCalendar();
     </script>
