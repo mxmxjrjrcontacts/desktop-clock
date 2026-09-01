@@ -118,6 +118,13 @@
             background: rgba(56, 189, 248, 0.4);
         }
 
+        .music-player button.active {
+            background: rgba(56, 189, 248, 0.6);
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+        }
+
         #player-wrapper {
             display: none;
             width: 100%;
@@ -220,6 +227,7 @@
         <div class="music-player">
             <input type="text" id="youtube-url" placeholder="Paste YouTube link here...">
             <button onclick="playAudioStream()" title="Play">▶</button>
+            <button onclick="toggleLoop()" id="loop-btn" class="active" title="Toggle Loop">🔁</button>
             <button onclick="stopAudioStream()" title="Stop">⏹</button>
         </div>
 
@@ -231,6 +239,8 @@
     </div>
 
     <script>
+        let isLoopEnabled = true;
+
         function updateClockAndCalendar() {
             const now = new Date();
             
@@ -314,6 +324,21 @@
             return videoId;
         }
 
+        function toggleLoop() {
+            isLoopEnabled = !isLoopEnabled;
+            const loopBtn = document.getElementById('loop-btn');
+            if (isLoopEnabled) {
+                loopBtn.classList.add('active');
+            } else {
+                loopBtn.classList.remove('active');
+            }
+            // If player is currently running, re-render to apply loop parameter
+            const ytUrl = document.getElementById('youtube-url').value.trim();
+            if (ytUrl && document.getElementById('player-wrapper').style.display === 'block') {
+                playAudioStream();
+            }
+        }
+
         function playAudioStream() {
             const ytUrl = document.getElementById('youtube-url').value.trim();
             const videoId = extractYouTubeId(ytUrl);
@@ -326,8 +351,10 @@
             }
 
             wrapper.style.display = "block";
+            const loopParams = isLoopEnabled ? `&loop=1&playlist=${videoId}` : `&loop=0`;
+            
             slot.innerHTML = `
-                <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}" 
+                <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1${loopParams}" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen>
                 </iframe>
