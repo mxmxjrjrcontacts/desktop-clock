@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dabi Clock, Calendar & Stream Player</title>
+    <title>Dabi Clock, Calendar & Audio Player</title>
     <style>
         * {
             margin: 0;
@@ -73,7 +73,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 6px;
+            margin-bottom: 12px;
             background: rgba(15, 23, 42, 0.4);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -125,21 +125,14 @@
             box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
         }
 
-        #player-wrapper {
-            display: none;
-            width: 100%;
-            height: 80px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        #player-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        #hidden-player-slot {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .calendar-year-grid {
@@ -231,12 +224,11 @@
             <button onclick="stopAudioStream()" title="Stop">⏹</button>
         </div>
 
-        <div id="player-wrapper">
-            <div id="player-slot" style="width:100%; height:100%;"></div>
-        </div>
-
         <div class="calendar-year-grid" id="year-calendar"></div>
     </div>
+
+    <!-- Offscreen Player Slot -->
+    <div id="hidden-player-slot"></div>
 
     <script>
         let isLoopEnabled = true;
@@ -332,9 +324,9 @@
             } else {
                 loopBtn.classList.remove('active');
             }
-            // If player is currently running, re-render to apply loop parameter
+            
             const ytUrl = document.getElementById('youtube-url').value.trim();
-            if (ytUrl && document.getElementById('player-wrapper').style.display === 'block') {
+            if (ytUrl && document.getElementById('hidden-player-slot').innerHTML !== '') {
                 playAudioStream();
             }
         }
@@ -342,28 +334,25 @@
         function playAudioStream() {
             const ytUrl = document.getElementById('youtube-url').value.trim();
             const videoId = extractYouTubeId(ytUrl);
-            const wrapper = document.getElementById('player-wrapper');
-            const slot = document.getElementById('player-slot');
+            const slot = document.getElementById('hidden-player-slot');
 
             if (!videoId) {
                 alert("Please paste a valid YouTube link.");
                 return;
             }
 
-            wrapper.style.display = "block";
             const loopParams = isLoopEnabled ? `&loop=1&playlist=${videoId}` : `&loop=0`;
             
             slot.innerHTML = `
                 <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1${loopParams}" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allow="autoplay" 
                     allowfullscreen>
                 </iframe>
             `;
         }
 
         function stopAudioStream() {
-            document.getElementById('player-slot').innerHTML = '';
-            document.getElementById('player-wrapper').style.display = 'none';
+            document.getElementById('hidden-player-slot').innerHTML = '';
         }
 
         setInterval(updateClockAndCalendar, 1000);
