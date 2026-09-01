@@ -24,7 +24,6 @@
             background-repeat: no-repeat;
         }
 
-        /* Subtle dark gradient overlay on the left side */
         .overlay {
             position: fixed;
             top: 0;
@@ -35,7 +34,6 @@
             z-index: 0;
         }
 
-        /* Main Container aligned strictly to the LEFT */
         .main-container {
             position: absolute;
             top: 50%;
@@ -49,7 +47,6 @@
             justify-content: center;
         }
 
-        /* Clock Section */
         .clock-container {
             margin-bottom: 8px;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
@@ -72,7 +69,6 @@
             text-transform: uppercase;
         }
 
-        /* Stream Input Bar */
         .music-player {
             display: flex;
             align-items: center;
@@ -122,12 +118,11 @@
             background: rgba(56, 189, 248, 0.4);
         }
 
-        /* Compact Mini Frame to allow browser media permissions */
         #player-wrapper {
             display: none;
             width: 100%;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.35);
+            height: 80px;
+            background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 6px;
             overflow: hidden;
@@ -140,7 +135,6 @@
             border: none;
         }
 
-        /* See-Through Full Year Calendar Grid: 4 columns x 3 rows */
         .calendar-year-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -181,7 +175,6 @@
             padding-bottom: 2px;
         }
 
-        /* Weekend header color (Sat & Sun in red) */
         .weekdays-row div:nth-child(6), 
         .weekdays-row div:nth-child(7) {
             color: #f87171;
@@ -196,7 +189,6 @@
             font-size: 0.58rem;
         }
 
-        /* Weekend day text color */
         .days-grid .weekend {
             color: #f87171;
             font-weight: 500;
@@ -206,7 +198,6 @@
             visibility: hidden;
         }
 
-        /* Circle around current date */
         .days-grid .today {
             border: 1.5px solid #ef4444;
             border-radius: 50%;
@@ -221,30 +212,25 @@
     <div class="overlay"></div>
 
     <div class="main-container">
-        <!-- Clock Display -->
         <div class="clock-container">
             <div id="clock">00:00:00</div>
             <div id="date">Loading...</div>
         </div>
 
-        <!-- Stream Player Bar -->
         <div class="music-player">
             <input type="text" id="youtube-url" placeholder="Paste YouTube link here...">
             <button onclick="playAudioStream()" title="Play">▶</button>
             <button onclick="stopAudioStream()" title="Stop">⏹</button>
         </div>
 
-        <!-- Compact Player Box -->
         <div id="player-wrapper">
             <div id="player-slot" style="width:100%; height:100%;"></div>
         </div>
 
-        <!-- Full Year Calendar Container (All 12 Months) -->
         <div class="calendar-year-grid" id="year-calendar"></div>
     </div>
 
     <script>
-        // Clock and Calendar Updater
         function updateClockAndCalendar() {
             const now = new Date();
             
@@ -273,7 +259,7 @@
             const currentDayNum = currentDate.getDate();
             
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const dayHeaders = ['M', 'T', 'W', 'T', 'F', 'S', 'S']; // Monday start
+            const dayHeaders = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
             let htmlContent = '';
 
@@ -288,7 +274,7 @@
                 htmlContent += `<div class="days-grid">`;
 
                 let firstDayIndex = new Date(year, m, 1).getDay();
-                firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1; // Convert to Monday start
+                firstDayIndex = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
 
                 let totalDays = new Date(year, m + 1, 0).getDate();
 
@@ -298,7 +284,7 @@
 
                 for (let d = 1; d <= totalDays; d++) {
                     let dayOfWeek = (firstDayIndex + d - 1) % 7;
-                    let isWeekend = (dayOfWeek === 5 || dayOfWeek === 6); // Sat & Sun
+                    let isWeekend = (dayOfWeek === 5 || dayOfWeek === 6);
                     let isToday = (m === currentMonthIndex && d === currentDayNum);
 
                     let classes = [];
@@ -316,7 +302,6 @@
             yearContainer.innerHTML = htmlContent;
         }
 
-        // YouTube ID Extractor
         function extractYouTubeId(url) {
             let videoId = '';
             if (url.includes('youtu.be/')) {
@@ -341,9 +326,8 @@
             }
 
             wrapper.style.display = "block";
-            // Includes autoplay, loop, origin spoof, and unrestricted permissions to satisfy browser autoplay
             slot.innerHTML = `
-                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&origin=https://localhost" 
+                <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                     allowfullscreen>
                 </iframe>
