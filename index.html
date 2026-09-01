@@ -12,43 +12,43 @@
         }
 
         :root {
-            /* Default Dark Mode Theme */
+            /* Default Dark Mode Theme (See-Through Glassmorphic) */
             --text-main: #ffffff;
             --text-sub: #cbd5e1;
             --text-accent: #38bdf8;
             --text-muted: #94a3b8;
-            --card-bg: #0f172a; /* 100% Opaque */
-            --card-border: rgba(255, 255, 255, 0.18);
-            --player-bg: #1e293b;
-            --input-bg: #0f172a;
+            --card-bg: rgba(15, 23, 42, 0.45); /* See-through glass */
+            --card-border: rgba(255, 255, 255, 0.15);
+            --player-bg: rgba(15, 23, 42, 0.5);
+            --input-bg: rgba(0, 0, 0, 0.3);
             --btn-bg: rgba(56, 189, 248, 0.2);
-            --btn-border: rgba(56, 189, 248, 0.5);
+            --btn-border: rgba(56, 189, 248, 0.4);
             --btn-text: #38bdf8;
-            --overlay-gradient: linear-gradient(90deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.45) 55%, rgba(15, 23, 42, 0.05) 100%);
+            --overlay-gradient: linear-gradient(90deg, rgba(11, 15, 25, 0.8) 0%, rgba(11, 15, 25, 0.45) 55%, rgba(11, 15, 25, 0.1) 100%);
             --weekend-color: #f87171;
             --today-bg: rgba(239, 68, 68, 0.35);
             --today-border: #ef4444;
             --today-text: #ffffff;
         }
 
-        /* Dynamic High-Contrast Light Theme (Triggered on light/bright backgrounds) */
+        /* Dynamic High-Contrast Light Theme (See-Through Glassmorphic for bright backgrounds) */
         body.theme-light {
             --text-main: #0f172a;
-            --text-sub: #334155;
+            --text-sub: #1e293b;
             --text-accent: #0284c7;
-            --text-muted: #64748b;
-            --card-bg: #ffffff; /* 100% Opaque */
-            --card-border: rgba(0, 0, 0, 0.15);
-            --player-bg: #f1f5f9;
-            --input-bg: #ffffff;
-            --btn-bg: rgba(2, 132, 199, 0.15);
+            --text-muted: #475569;
+            --card-bg: rgba(255, 255, 255, 0.55); /* See-through glass light */
+            --card-border: rgba(0, 0, 0, 0.18);
+            --player-bg: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.4);
+            --btn-bg: rgba(2, 132, 199, 0.2);
             --btn-border: rgba(2, 132, 199, 0.5);
             --btn-text: #0284c7;
             --overlay-gradient: linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.4) 55%, rgba(255, 255, 255, 0.05) 100%);
             --weekend-color: #dc2626;
-            --today-bg: rgba(220, 38, 38, 0.2);
+            --today-bg: rgba(220, 38, 38, 0.25);
             --today-border: #dc2626;
-            --today-text: #991b1b;
+            --today-text: #7f1d1d;
         }
 
         body, html {
@@ -61,7 +61,7 @@
             background-size: cover;
             background-position: right center;
             background-repeat: no-repeat;
-            transition: background-image 0.6s ease-in-out, color 0.3s ease;
+            transition: background-image 0.5s ease-in-out, color 0.3s ease;
         }
 
         .overlay {
@@ -90,7 +90,7 @@
 
         .clock-container {
             margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         #clock {
@@ -117,8 +117,8 @@
             gap: 6px;
             margin-bottom: 12px;
             background: var(--player-bg);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--card-border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             padding: 5px 8px;
             border-radius: 6px;
             width: 100%;
@@ -133,6 +133,7 @@
             color: var(--text-main);
             font-size: 0.75rem;
             outline: none;
+            backdrop-filter: blur(4px);
         }
 
         .music-player input[type="text"]::placeholder {
@@ -152,6 +153,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            backdrop-filter: blur(4px);
         }
 
         .music-player button:hover {
@@ -175,7 +177,6 @@
             pointer-events: none;
         }
 
-        /* Full Year Calendar Grid: 4 columns x 3 rows */
         .calendar-year-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -183,11 +184,12 @@
             width: 100%;
         }
 
-        /* 100% Solid Opaque Month Cards */
+        /* See-Through Glassmorphic Month Cards */
         .month-card {
             background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--card-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border-radius: 6px;
             padding: 6px 8px;
             text-align: left;
@@ -277,35 +279,37 @@
     <div id="hidden-player-slot"></div>
 
     <script>
-        // Full list of 24 registered artworks
-        const artworkList = [
-            'ash-ketchum-pikachu-3840x2160-10890.jpg',
+        // Full list of 24 renamed wallpapers
+        const rawArtworkList = [
             'dabimyhero.png',
-            'denki-kaminari-stun-gun-hero-my-hero-academia-yellow-3840x2160-9145.png',
-            'fullmetal-alchemist-3840x2160-10389.png',
-            'fullmetal-alchemist-3840x2160-10396.png',
-            'gintoki-sakata-3840x2160-16158.jpg',
-            'goku-daima-dragon-3840x2160-23162.jpg',
-            'goku-orange-3840x2160-23199.jpg',
-            'ichigo-kurosaki-3840x2160-10580.png',
-            'ino-yamanaka-hinata-3840x2160-15427.jpg',
-            'itachi-uchiha-3840x2160-9181.jpg',
-            'itachi-uchiha-naruto-minimal-art-red-background-5k-3840x2160-7749.jpg',
-            'izuku-midoriya-deku-3840x2160-10511.png',
-            'izuku-midoriya-deku-my-hero-academia-green-background-3840x2160-9151.png',
-            'kakashi-hatake-naruto-minimal-art-3840x2160-8185.png',
-            'monkey-d-luffy-3840x2160-15618.png',
-            'monkey-d-luffy-3840x2160-25434.jpg',
-            'my-hero-academia-3840x2160-20839.png',
-            'naruto-uzumaki-3840x2160-25560.png',
-            'solo-leveling-blue-3840x2160-17997.jpg',
-            'son-goku-power-pole-3840x2160-25348.jpg',
-            'sung-jinwoo-blue-3840x2160-21294.jpg',
-            'tanjiro-kamado-3840x2160-9316.png',
-            'zenitsu-agatsuma-3840x2160-26517.png'
+            'wallpaper 0001 (1).jpg',
+            'wallpaper 0001 (2).jpg',
+            'wallpaper 0001 (3).jpg',
+            'wallpaper 0001 (4).jpg',
+            'wallpaper 0001 (5).jpg',
+            'wallpaper 0001 (6).jpg',
+            'wallpaper 0001 (7).jpg',
+            'wallpaper 0001 (8).jpg',
+            'wallpaper 0001 (9).jpg',
+            'wallpaper 0001 (10).jpg',
+            'wallpaper 0001 (11).jpg',
+            'wallpaper 002 (1).png',
+            'wallpaper 002 (2).png',
+            'wallpaper 002 (3).png',
+            'wallpaper 002 (4).png',
+            'wallpaper 002 (5).png',
+            'wallpaper 002 (6).png',
+            'wallpaper 002 (7).png',
+            'wallpaper 002 (8).png',
+            'wallpaper 002 (9).png',
+            'wallpaper 002 (10).png',
+            'wallpaper 002 (11).png',
+            'wallpaper 002 (12).png'
         ];
 
-        // Fisher-Yates Shuffle
+        // Format names safely for URLs (handles spaces and parentheses)
+        const artworkList = rawArtworkList.map(name => encodeURI(name));
+
         function shuffle(array) {
             let arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -315,11 +319,11 @@
             return arr;
         }
 
-        // Persistent Non-repeating Cycle Manager using localStorage
+        // Persistent Shuffle Deck (Cycles without repeats across reloads and clicks)
         function getNextArtwork() {
             let queue = [];
             try {
-                const savedQueue = localStorage.getItem('wallpaper_deck');
+                const savedQueue = localStorage.getItem('wallpaper_deck_v2');
                 if (savedQueue) {
                     queue = JSON.parse(savedQueue);
                 }
@@ -327,17 +331,16 @@
                 queue = [];
             }
 
-            // If queue is empty or exhausted, create a fresh randomized deck
-            if (!queue || queue.length === 0) {
+            if (!Array.isArray(queue) || queue.length === 0) {
                 queue = shuffle(artworkList);
             }
 
             const nextImg = queue.pop();
-            localStorage.setItem('wallpaper_deck', JSON.stringify(queue));
+            localStorage.setItem('wallpaper_deck_v2', JSON.stringify(queue));
             return nextImg;
         }
 
-        // Dynamic Contrast Detection via Offscreen Canvas
+        // Dynamic Contrast Detection via Canvas
         function applyArtwork(imageSrc) {
             document.body.style.backgroundImage = `url('${imageSrc}')`;
             
@@ -352,7 +355,7 @@
                     canvas.width = 100;
                     canvas.height = 100;
 
-                    // Sample the left 50% where text and calendar reside
+                    // Sample the left half of the image
                     ctx.drawImage(img, 0, 0, img.width * 0.5, img.height, 0, 0, 100, 100);
                     const imgData = ctx.getImageData(0, 0, 100, 100).data;
 
@@ -369,17 +372,16 @@
                     const avgG = totalG / count;
                     const avgB = totalB / count;
 
-                    // Perceived luminance formula (ITU-R BT.709)
+                    // Relative luminance formula (ITU-R BT.709)
                     const brightness = (avgR * 0.2126) + (avgG * 0.7152) + (avgB * 0.0722);
 
-                    // Switch to theme-light if background is bright
-                    if (brightness > 135) {
+                    if (brightness > 130) {
                         document.body.classList.add('theme-light');
                     } else {
                         document.body.classList.remove('theme-light');
                     }
                 } catch (e) {
-                    console.log("Contrast calculation fallback active.");
+                    console.log("Canvas contrast active.");
                 }
             };
         }
@@ -388,7 +390,7 @@
             applyArtwork(getNextArtwork());
         }
 
-        // Auto switch wallpaper every 10 minutes (600,000 ms)
+        // Auto-switch wallpaper every 10 minutes (600,000 ms)
         setInterval(() => {
             applyArtwork(getNextArtwork());
         }, 10 * 60 * 1000);
@@ -519,7 +521,7 @@
             document.getElementById('hidden-player-slot').innerHTML = '';
         }
 
-        // Run immediately on page load: select next non-repeating wallpaper and start clocks
+        // Run immediately on page load
         applyArtwork(getNextArtwork());
         setInterval(updateClockAndCalendar, 1000);
         updateClockAndCalendar();
