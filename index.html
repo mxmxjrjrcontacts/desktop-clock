@@ -267,6 +267,34 @@
         </div>
 
         <div class="calendar-year-grid" id="year-calendar"></div>
+
+        <!-- Server Services Telemetry Bar (Hidden by default) -->
+        <div id="server-telemetry-container" style="display: none; margin-top: 15px; font-family: monospace; font-size: 13px;">
+            <div style="display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;" id="service-pills">
+                <!-- Pills will populate here dynamically -->
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 8px;">
+                <button onclick="toggleLogDrawer()" style="background: #2b2b2b; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 11px;">Live Logs</button>
+                <button onclick="triggerRollback()" style="background: #4a2b2b; color: #fff; border: 1px solid #663333; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 11px;">Rollback (1 Step)</button>
+                <a href="http://192.168.0.20:8088/generate-rebuild" download="bootstrap_restore.sh" style="text-decoration: none; background: #224422; color: #fff; border: 1px solid #336633; border-radius: 4px; padding: 3px 8px; font-size: 11px;">1-Click Rebuild Script</a>
+            </div>
+
+            <!-- Collapsible Live Log Terminal Drawer -->
+            <div id="log-drawer" style="display: none; margin-top: 10px; background: #121212; border: 1px solid #333; border-radius: 6px; padding: 8px; max-height: 180px; overflow-y: auto; text-align: left; color: #33ff33;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px;">
+                    <span id="log-title">Streaming logs...</span>
+                    <select id="log-selector" onchange="switchLogStream(this.value)" style="background: #222; color: #fff; border: 1px solid #444; font-size: 11px;">
+                        <option value="ai-agent">ai-agent</option>
+                        <option value="nas-samba">nas-samba</option>
+                        <option value="jellyfin">jellyfin</option>
+                        <option value="aria2">aria2</option>
+                        <option value="system">system / rclone</option>
+                    </select>
+                </div>
+                <pre id="log-stream-output" style="margin: 0; white-space: pre-wrap; font-size: 11px; font-family: monospace;"></pre>
+            </div>
+        </div>
     </div>
 
     <!-- Hidden Canvas for Contrast Detection -->
@@ -513,6 +541,90 @@
         applyArtwork(getNextArtwork());
         setInterval(updateClockAndCalendar, 1000);
         updateClockAndCalendar();
+    </script>
+
+    <!-- Telemetry Client Script -->
+    <script>
+    (function() {
+        const SERVER_API = "http://192.168.0.20:8088";
+        let eventSource = null;
+
+        async function checkLaptopAndInit() {
+            // Check if flagged or set flag on laptop
+            if (!localStorage.getItem('isMasterLaptop')) {
+                // First-time laptop authorization confirmation
+                if (window.location.search.includes('enable_server=1')) {
+                    localStorage.setItem('isMasterLaptop', 'true');
+                } else {
+                    return; // Stays hidden on other devices
+                }
+            }
+
+            try {
+                const ping = await fetch(`${SERVER_API}/health`, { method: "GET", mode: "cors" });
+                const data = await ping.json();
+                if (data.status === "ok") {
+                    document.getElementById("server-telemetry-container").style.display = "block";
+                    refreshServices();
+                    setInterval(refreshServices, 10000); // 10s auto-refresh
+                }
+            } catch (e) {
+                // Server unreachable (not on LAN or off-site) -> remain hidden
+                document.getElementById("server-telemetry-container").style.display = "none";
+            }
+        }
+
+        async function refreshServices() {
+            try {
+                const res = await fetch(`${SERVER_API}/status`);
+                const services = await res.json();
+                const container = document.getElementById("service-pills");
+                container.innerHTML = "";
+
+                for (const [name, meta] of Object.entries(services)) {
+                    const color = meta.badge === "green" ? "#28a745" : (meta.badge === "yellow" ? "#ffc107" : "#dc3545");
+                    const textColor = meta.badge === "yellow" ? "#000" : "#fff";
+                    const warnIcon = meta.badge !== "green" ? " ⚠️" : "";
+
+                    const pill = document.createElement("div");
+                    pill.style = `background: ${color}; color: ${textColor}; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: help;`;
+                    pill.title = `${name}: ${meta.detail}`;
+                    pill.innerText = `${name}${warnIcon}`;
+                    container.appendChild(pill);
+                }
+            } catch (err) {}
+        }
+
+        window.toggleLogDrawer = function() {
+            const el = document.getElementById("log-drawer");
+            el.style.display = el.style.display === "none" ? "block" : "none";
+            if (el.style.display === "block") {
+                switchLogStream(document.getElementById("log-selector").value);
+            } else if (eventSource) {
+                eventSource.close();
+            }
+        };
+
+        window.switchLogStream = function(service) {
+            if (eventSource) eventSource.close();
+            const output = document.getElementById("log-stream-output");
+            output.innerText = `[Connecting live feed for ${service}...]\n`;
+            eventSource = new EventSource(`${SERVER_API}/logs/stream?service=${service}`);
+            eventSource.onmessage = function(e) {
+                output.innerText += JSON.parse(e.data) + "\n";
+                output.parentElement.scrollTop = output.parentElement.scrollHeight;
+            };
+        };
+
+        window.triggerRollback = async function() {
+            if (!confirm("Rollback containers to previous snapshot?")) return;
+            const res = await fetch(`${SERVER_API}/rollback`, { method: "POST" });
+            const result = await res.json();
+            alert(result.success ? `Rollback Successful: ${result.restored}` : `Rollback Failed`);
+        };
+
+        checkLaptopAndInit();
+    })();
     </script>
 </body>
 </html>
