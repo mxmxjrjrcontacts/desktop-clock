@@ -294,7 +294,8 @@
                         <option value="nas-samba">📁 nas-samba</option>
                         <option value="jellyfin">🎬 jellyfin</option>
                         <option value="aria2">⬇️ aria2</option>
-                        <option value="system">☁️ google-drive-sync / system</option>
+                        <option value="google-drive-sync">☁️ google-drive-sync</option>
+                        <option value="system">🖥️ system log</option>
                     </select>
                 </div>
                 <pre id="log-stream-output" style="margin: 0; white-space: pre-wrap; font-size: 9.5px; font-family: monospace;"></pre>
@@ -614,10 +615,32 @@
                         user-select: none;
                         transition: transform 0.15s ease;
                     `;
-                    pill.title = `${name.toUpperCase()}\nStatus: ${meta.detail}`;
+                    pill.title = `${name.toUpperCase()}\nStatus: ${meta.detail}\n${isWarn || isErr ? "Click to restart" : "Click to view logs"}`;
                     pill.innerHTML = `<span>${icon}</span>${isWarn || isErr ? '<span style="position:absolute; top:-3px; right:-3px; font-size:9px;">⚠️</span>' : ''}`;
-                    pill.onclick = () => {
-                        document.getElementById("log-selector").value = (name === 'google-drive-sync' ? 'system' : name);
+                    
+                    pill.onclick = async () => {
+                        // If there is an issue, offer a 1-click restart prompt
+                        if (isWarn || isErr) {
+                            const wantRestart = confirm(`[ALERT] ${name.toUpperCase()} has an issue:\n${meta.detail}\n\nDo you want to restart it now?`);
+                            if (wantRestart) {
+                                try {
+                                    const restartRes = await fetch(`${SERVER_API}/restart-service`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ service: name })
+                                    });
+                                    const out = await restartRes.json();
+                                    alert(out.message || "Restart command sent.");
+                                    setTimeout(refreshServices, 2500);
+                                    return;
+                                } catch (e) {
+                                    alert("Could not trigger restart: " + e.message);
+                                }
+                            }
+                        }
+
+                        // Otherwise open/switch log stream
+                        document.getElementById("log-selector").value = name;
                         const drawer = document.getElementById("log-drawer");
                         if (drawer.style.display !== "block") {
                             toggleLogDrawer();
@@ -660,9 +683,9 @@
 
         window.triggerSecureRebuild = async function() {
             const proceed = confirm(
-                "WARNING: REBUILD SCRIPT GENERATOR\\n\\n" +
-                "This function generates an automated migration & deployment script\\n" +
-                "to stand up this entire server stack from scratch on a new machine.\\n\\n" +
+                "WARNING: REBUILD SCRIPT GENERATOR\n\n" +
+                "This function generates an automated migration & deployment script\n" +
+                "to stand up this entire server stack from scratch on a new machine.\n\n" +
                 "Do you want to authenticate and download this script?"
             );
             if (!proceed) return;
