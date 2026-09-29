@@ -248,6 +248,56 @@
             font-weight: 900;
             text-shadow: var(--text-shadow);
         }
+
+        /* Server Hub Hover & Slide Elements */
+        @keyframes serverPulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); opacity: 1; }
+            50% { box-shadow: 0 0 8px 3px rgba(16, 185, 129, 0.4); opacity: 0.7; }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); opacity: 1; }
+        }
+
+        @keyframes alertBlink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .server-pulse-ok {
+            animation: serverPulse 2s infinite ease-in-out;
+        }
+
+        .server-pulse-warn {
+            animation: alertBlink 1.2s infinite ease-in-out;
+        }
+
+        .hub-container {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 8px;
+            font-family: monospace;
+            position: relative;
+        }
+
+        .hub-slider {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-left 0.3s ease;
+            margin-left: 0;
+            pointer-events: none;
+        }
+
+        /* Slide to right on hovering either the server hub icon or the slide itself */
+        .hub-container:hover .hub-slider {
+            max-width: 420px;
+            opacity: 1;
+            margin-left: 8px;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
@@ -268,21 +318,29 @@
 
         <div class="calendar-year-grid" id="year-calendar"></div>
 
-        <!-- Server Services Telemetry Bar (Single Inline Row) -->
-        <div id="server-telemetry-container" style="display: none; margin-top: 8px; font-family: monospace;">
-            <div style="display: flex; gap: 5px; justify-content: flex-start; align-items: center; flex-wrap: wrap;">
-                <!-- Service Icon Badges -->
-                <div id="service-pills" style="display: flex; gap: 5px; align-items: center;"></div>
-                
-                <!-- Separator -->
-                <span style="color: var(--card-border); font-size: 12px; margin: 0 2px;">|</span>
+        <!-- Hover-Activated Server Hub Bar -->
+        <div id="server-telemetry-container" style="display: none;">
+            <div class="hub-container">
+                <!-- Master Server Icon Badge -->
+                <div id="master-server-btn" class="server-pulse-ok" style="position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: rgba(16, 185, 129, 0.2); border: 1.5px solid #10b981; font-size: 14px; cursor: pointer; user-select: none;">
+                    <span>🖥️</span>
+                    <div id="master-alert-tag" style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; border-radius: 50%; min-width: 14px; height: 14px; padding: 0 2px; align-items: center; justify-content: center; border: 1px solid #fff;">0</div>
+                </div>
 
-                <!-- Action Controls Inline -->
-                <button onclick="toggleLogDrawer()" title="View container & system live logs" style="background: rgba(0,0,0,0.4); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">📋</button>
-                
-                <button onclick="triggerRollback()" title="Rollback stack 1 snapshot backwards" style="background: rgba(185,28,28,0.25); color: #f87171; border: 1px solid rgba(239,68,68,0.5); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">↺</button>
-                
-                <button onclick="triggerSecureRebuild()" title="Rebuild server stack (requires SSH password verification)" style="background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.5); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">⚡</button>
+                <!-- Slidable Strip (Hidden by default, expands to the right on hover) -->
+                <div class="hub-slider">
+                    <!-- Service Pills (🤖 📁 🎬 ⬇️ ☁️) -->
+                    <div id="service-pills" style="display: flex; gap: 5px; align-items: center;"></div>
+
+                    <span style="color: var(--card-border); font-size: 12px; margin: 0 2px;">|</span>
+
+                    <!-- Action Controls -->
+                    <button onclick="toggleLogDrawer()" title="View container & system live logs" style="background: rgba(0,0,0,0.4); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">📋</button>
+                    
+                    <button onclick="triggerRollback()" title="Rollback stack 1 snapshot backwards" style="background: rgba(185,28,28,0.25); color: #f87171; border: 1px solid rgba(239,68,68,0.5); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">↺</button>
+                    
+                    <button onclick="triggerSecureRebuild()" title="Rebuild server stack (requires SSH password verification)" style="background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.5); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">⚡</button>
+                </div>
             </div>
 
             <!-- Collapsible Live Log Terminal Drawer -->
@@ -591,11 +649,19 @@
                 const container = document.getElementById("service-pills");
                 container.innerHTML = "";
 
+                let issueCount = 0;
+                let hasRed = false;
+
                 for (const [name, meta] of Object.entries(services)) {
                     const icon = serviceIcons[name] || '⚙️';
                     const isWarn = meta.badge === "yellow";
                     const isErr = meta.badge === "red";
                     
+                    if (isWarn || isErr) {
+                        issueCount++;
+                        if (isErr) hasRed = true;
+                    }
+
                     const borderColor = isErr ? "#ef4444" : (isWarn ? "#f59e0b" : "#10b981");
                     const bgColor = isErr ? "rgba(239, 68, 68, 0.3)" : (isWarn ? "rgba(245, 158, 11, 0.3)" : "rgba(16, 185, 129, 0.25)");
 
@@ -618,8 +684,9 @@
                     pill.title = `${name.toUpperCase()}\nStatus: ${meta.detail}\n${isWarn || isErr ? "Click to restart" : "Click to view logs"}`;
                     pill.innerHTML = `<span>${icon}</span>${isWarn || isErr ? '<span style="position:absolute; top:-3px; right:-3px; font-size:9px;">⚠️</span>' : ''}`;
                     
-                    pill.onclick = async () => {
-                        // If there is an issue, offer a 1-click restart prompt
+                    pill.onclick = async (e) => {
+                        e.stopPropagation();
+                        // 1-Click restart prompt on error/warn
                         if (isWarn || isErr) {
                             const wantRestart = confirm(`[ALERT] ${name.toUpperCase()} has an issue:\n${meta.detail}\n\nDo you want to restart it now?`);
                             if (wantRestart) {
@@ -630,16 +697,16 @@
                                         body: JSON.stringify({ service: name })
                                     });
                                     const out = await restartRes.json();
-                                    alert(out.message || "Restart command sent.");
+                                    alert(out.message || "Restart command dispatched.");
                                     setTimeout(refreshServices, 2500);
                                     return;
-                                } catch (e) {
-                                    alert("Could not trigger restart: " + e.message);
+                                } catch (err) {
+                                    alert("Could not trigger restart: " + err.message);
                                 }
                             }
                         }
 
-                        // Otherwise open/switch log stream
+                        // Open/switch log stream
                         document.getElementById("log-selector").value = name;
                         const drawer = document.getElementById("log-drawer");
                         if (drawer.style.display !== "block") {
@@ -649,6 +716,26 @@
                         }
                     };
                     container.appendChild(pill);
+                }
+
+                // Update Master Server Icon Status
+                const masterBtn = document.getElementById("master-server-btn");
+                const alertTag = document.getElementById("master-alert-tag");
+
+                if (issueCount === 0) {
+                    masterBtn.className = "server-pulse-ok";
+                    masterBtn.style.background = "rgba(16, 185, 129, 0.2)";
+                    masterBtn.style.border = "1.5px solid #10b981";
+                    masterBtn.title = "All Server Services Healthy (Hover to inspect)";
+                    alertTag.style.display = "none";
+                } else {
+                    masterBtn.className = "server-pulse-warn";
+                    masterBtn.style.background = hasRed ? "rgba(239, 68, 68, 0.3)" : "rgba(245, 158, 11, 0.3)";
+                    masterBtn.style.border = hasRed ? "1.5px solid #ef4444" : "1.5px solid #f59e0b";
+                    masterBtn.title = `${issueCount} Service Issue(s) Detected! Hover to resolve.`;
+                    alertTag.style.display = "flex";
+                    alertTag.style.background = hasRed ? "#ef4444" : "#f59e0b";
+                    alertTag.innerText = issueCount;
                 }
             } catch (err) {}
         }
