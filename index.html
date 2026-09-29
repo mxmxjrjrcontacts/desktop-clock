@@ -268,20 +268,25 @@
 
         <div class="calendar-year-grid" id="year-calendar"></div>
 
-        <!-- Server Services Telemetry Bar (Icon-Only Layout) -->
+        <!-- Server Services Telemetry Bar (Single Inline Row) -->
         <div id="server-telemetry-container" style="display: none; margin-top: 8px; font-family: monospace;">
-            <div style="display: flex; gap: 6px; justify-content: flex-start; align-items: center;" id="service-pills">
-                <!-- Compact Icon Badges Render Here -->
-            </div>
-            
-            <div style="display: flex; gap: 6px; justify-content: flex-start; margin-top: 6px;">
-                <button onclick="toggleLogDrawer()" style="background: rgba(0,0,0,0.4); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 10px;">📋 Logs</button>
-                <button onclick="triggerRollback()" style="background: rgba(185,28,28,0.3); color: #f87171; border: 1px solid rgba(239,68,68,0.5); border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 10px;">↺ Rollback</button>
-                <a href="http://192.168.0.20:8088/generate-rebuild" download="bootstrap_restore.sh" style="text-decoration: none; background: rgba(16,185,129,0.25); color: #34d399; border: 1px solid rgba(16,185,129,0.5); border-radius: 4px; padding: 2px 6px; font-size: 10px; display: inline-flex; align-items: center;">⚡ Rebuild</a>
+            <div style="display: flex; gap: 5px; justify-content: flex-start; align-items: center; flex-wrap: wrap;">
+                <!-- Service Icon Badges -->
+                <div id="service-pills" style="display: flex; gap: 5px; align-items: center;"></div>
+                
+                <!-- Separator -->
+                <span style="color: var(--card-border); font-size: 12px; margin: 0 2px;">|</span>
+
+                <!-- Action Controls Inline -->
+                <button onclick="toggleLogDrawer()" title="View container & system live logs" style="background: rgba(0,0,0,0.4); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">📋</button>
+                
+                <button onclick="triggerRollback()" title="Rollback stack 1 snapshot backwards" style="background: rgba(185,28,28,0.25); color: #f87171; border: 1px solid rgba(239,68,68,0.5); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">↺</button>
+                
+                <button onclick="triggerSecureRebuild()" title="Rebuild server stack (requires SSH password verification)" style="background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.5); border-radius: 5px; width: 26px; height: 26px; cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;">⚡</button>
             </div>
 
             <!-- Collapsible Live Log Terminal Drawer -->
-            <div id="log-drawer" style="display: none; margin-top: 6px; background: rgba(10, 15, 25, 0.92); border: 1px solid var(--card-border); border-radius: 6px; padding: 6px; max-height: 150px; overflow-y: auto; text-align: left; color: #4ade80;">
+            <div id="log-drawer" style="display: none; margin-top: 6px; background: rgba(10, 15, 25, 0.95); border: 1px solid var(--card-border); border-radius: 6px; padding: 6px; max-height: 150px; overflow-y: auto; text-align: left; color: #4ade80;">
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 3px; margin-bottom: 4px;">
                     <span id="log-title" style="font-size: 10px; color: var(--text-sub);">Live Stream</span>
                     <select id="log-selector" onchange="switchLogStream(this.value)" style="background: #111; color: #fff; border: 1px solid var(--card-border); font-size: 10px; border-radius: 3px;">
@@ -376,7 +381,6 @@
                     canvas.width = 100;
                     canvas.height = 100;
 
-                    // Sample the left 33% where elements reside
                     ctx.drawImage(img, 0, 0, img.width * 0.35, img.height, 0, 0, 100, 100);
                     const imgData = ctx.getImageData(0, 0, 100, 100).data;
 
@@ -652,6 +656,45 @@
             const res = await fetch(`${SERVER_API}/rollback`, { method: "POST" });
             const result = await res.json();
             alert(result.success ? `Rollback Successful: ${result.restored}` : `Rollback Failed`);
+        };
+
+        window.triggerSecureRebuild = async function() {
+            const proceed = confirm(
+                "WARNING: REBUILD SCRIPT GENERATOR\\n\\n" +
+                "This function generates an automated migration & deployment script\\n" +
+                "to stand up this entire server stack from scratch on a new machine.\\n\\n" +
+                "Do you want to authenticate and download this script?"
+            );
+            if (!proceed) return;
+
+            const password = prompt("Enter SSH password for 'max':");
+            if (!password) return;
+
+            try {
+                const res = await fetch(`${SERVER_API}/verify-and-rebuild`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ password: password })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    const blob = new Blob([data.script], { type: "text/x-shellscript" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "bootstrap_restore.sh";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    alert("Authentication successful. 'bootstrap_restore.sh' has been downloaded.");
+                } else {
+                    alert("Authentication Failed: " + (data.error || "Incorrect password."));
+                }
+            } catch (err) {
+                alert("Error communicating with server agent.");
+            }
         };
 
         checkLaptopAndInit();
