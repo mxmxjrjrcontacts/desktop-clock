@@ -353,7 +353,7 @@
                         <option value="jellyfin">🎬 jellyfin</option>
                         <option value="aria2">⬇️ aria2</option>
                         <option value="google-drive-sync">☁️ google-drive-sync</option>
-                        <option value="system">🖥️ system log</option>
+                        <option value="system">🖥️️ system log</option>
                     </select>
                 </div>
                 <pre id="log-stream-output" style="margin: 0; white-space: pre-wrap; font-size: 9.5px; font-family: monospace;"></pre>
@@ -368,6 +368,7 @@
     <div id="hidden-player-slot"></div>
 
     <script>
+        // Clean array containing dabimyhero.png, wallpaper 0001 (1)-(11), and wallpaper 002 (1)-(81)
         const rawArtworkList = [
             'dabimyhero.png',
             'wallpaper 0001 (1).jpg',
@@ -380,20 +381,13 @@
             'wallpaper 0001 (8).jpg',
             'wallpaper 0001 (9).jpg',
             'wallpaper 0001 (10).jpg',
-            'wallpaper 0001 (11).jpg',
-            'wallpaper 002 (1).png',
-            'wallpaper 002 (2).png',
-            'wallpaper 002 (3).png',
-            'wallpaper 002 (4).png',
-            'wallpaper 002 (5).png',
-            'wallpaper 002 (6).png',
-            'wallpaper 002 (7).png',
-            'wallpaper 002 (8).png',
-            'wallpaper 002 (9).png',
-            'wallpaper 002 (10).png',
-            'wallpaper 002 (11).png',
-            'wallpaper 002 (12).png'
+            'wallpaper 0001 (11).jpg'
         ];
+
+        // Dynamically add all wallpaper 002 (1) through (81)
+        for (let i = 1; i <= 81; i++) {
+            rawArtworkList.push(`wallpaper 002 (${i}).png`);
+        }
 
         const artworkList = rawArtworkList.map(name => encodeURI(name));
 
@@ -409,7 +403,8 @@
         function getNextArtwork() {
             let queue = [];
             try {
-                const savedQueue = localStorage.getItem('wallpaper_deck_v2');
+                // v3 key flushes old 24-image cache to immediately use all 93 wallpapers
+                const savedQueue = localStorage.getItem('wallpaper_deck_v3');
                 if (savedQueue) {
                     queue = JSON.parse(savedQueue);
                 }
@@ -417,12 +412,13 @@
                 queue = [];
             }
 
+            // If empty or finished, reshuffle full deck randomly without repeats
             if (!Array.isArray(queue) || queue.length === 0) {
                 queue = shuffle(artworkList);
             }
 
             const nextImg = queue.pop();
-            localStorage.setItem('wallpaper_deck_v2', JSON.stringify(queue));
+            localStorage.setItem('wallpaper_deck_v3', JSON.stringify(queue));
             return nextImg;
         }
 
@@ -653,7 +649,7 @@
                 let hasRed = false;
 
                 for (const [name, meta] of Object.entries(services)) {
-                    const icon = serviceIcons[name] || '⚙️';
+                    const icon = serviceIcons[name] || '⚙️️';
                     const isWarn = meta.badge === "yellow";
                     const isErr = meta.badge === "red";
                     
@@ -686,7 +682,6 @@
                     
                     pill.onclick = async (e) => {
                         e.stopPropagation();
-                        // 1-Click restart prompt on error/warn
                         if (isWarn || isErr) {
                             const wantRestart = confirm(`[ALERT] ${name.toUpperCase()} has an issue:\n${meta.detail}\n\nDo you want to restart it now?`);
                             if (wantRestart) {
@@ -706,7 +701,6 @@
                             }
                         }
 
-                        // Open/switch log stream
                         document.getElementById("log-selector").value = name;
                         const drawer = document.getElementById("log-drawer");
                         if (drawer.style.display !== "block") {
@@ -718,7 +712,6 @@
                     container.appendChild(pill);
                 }
 
-                // Update Master Server Icon Status
                 const masterBtn = document.getElementById("master-server-btn");
                 const alertTag = document.getElementById("master-alert-tag");
 
