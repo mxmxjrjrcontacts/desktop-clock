@@ -81,13 +81,23 @@
         }
 
         #clock {
-            font-size: 2.5rem;
+            font-size: 2.35rem;
             font-weight: 800;
             letter-spacing: 1.5px;
             font-variant-numeric: tabular-nums;
             line-height: 1;
             color: var(--text-main);
             text-shadow: var(--text-shadow);
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        #clock-ampm {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-accent);
         }
 
         #date {
@@ -304,7 +314,10 @@
 
     <div class="main-container">
         <div class="clock-container">
-            <div id="clock">00:00:00</div>
+            <div id="clock">
+                <span id="clock-time">12:00:00</span>
+                <span id="clock-ampm">AM</span>
+            </div>
             <div id="date">Loading...</div>
         </div>
 
@@ -353,7 +366,7 @@
                         <option value="jellyfin">🎬 jellyfin</option>
                         <option value="aria2">⬇️ aria2</option>
                         <option value="google-drive-sync">☁️ google-drive-sync</option>
-                        <option value="system">🖥️️ system log</option>
+                        <option value="system">🖥️ system log</option>
                     </select>
                 </div>
                 <pre id="log-stream-output" style="margin: 0; white-space: pre-wrap; font-size: 9.5px; font-family: monospace;"></pre>
@@ -403,7 +416,6 @@
         function getNextArtwork() {
             let queue = [];
             try {
-                // v3 key flushes old 24-image cache to immediately use all 93 wallpapers
                 const savedQueue = localStorage.getItem('wallpaper_deck_v3');
                 if (savedQueue) {
                     queue = JSON.parse(savedQueue);
@@ -412,7 +424,6 @@
                 queue = [];
             }
 
-            // If empty or finished, reshuffle full deck randomly without repeats
             if (!Array.isArray(queue) || queue.length === 0) {
                 queue = shuffle(artworkList);
             }
@@ -476,7 +487,9 @@
         function updateClockAndCalendar() {
             const now = new Date();
             
-            let hours = now.getHours();
+            let rawHours = now.getHours();
+            const ampm = rawHours >= 12 ? 'PM' : 'AM';
+            let hours = rawHours % 12 || 12;
             let minutes = now.getMinutes();
             let seconds = now.getSeconds();
 
@@ -484,7 +497,8 @@
             minutes = minutes < 10 ? '0' + minutes : minutes;
             seconds = seconds < 10 ? '0' + seconds : seconds;
 
-            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('clock-time').innerText = `${hours}:${minutes}:${seconds}`;
+            document.getElementById('clock-ampm').innerText = ampm;
 
             const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('date').innerText = now.toLocaleDateString(undefined, dateOptions);
@@ -649,7 +663,7 @@
                 let hasRed = false;
 
                 for (const [name, meta] of Object.entries(services)) {
-                    const icon = serviceIcons[name] || '⚙️️';
+                    const icon = serviceIcons[name] || '⚙️';
                     const isWarn = meta.badge === "yellow";
                     const isErr = meta.badge === "red";
                     
